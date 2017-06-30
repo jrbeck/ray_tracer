@@ -75,11 +75,15 @@ bool Vec3::operator!=(const Vec3& a) const {
   return !isEqual(a);
 }
 
-void Vec3::print(const char* str) const {
-  if (str == nullptr) {
-    printf("Vec3: <%.3f, %.3f, %.3f>\n", x, y, z);
+void Vec3::print() const {
+  print(nullptr);
+}
+
+void Vec3::print(const char* label) const {
+  if (label == nullptr) {
+    printf("Vec3: <%.2f, %.2f, %.2f>\n", x, y, z);
   } else {
-    printf("%s <%.3f, %.3f, %.3f>\n", str, x, y, z);
+    printf("%s <%.3f, %.3f, %.3f>\n", label, x, y, z);
   }
 }
 
@@ -103,11 +107,7 @@ Vec3 Vec3::unit() const {
   // this is probably not the right way to handle this
   if (len <= 0.0) return Vec3(1, 0, 0);
   len = 1.0 / len;
-  return Vec3(
-    x * len,
-    y * len,
-    z * len
-  );
+  return Vec3(x * len, y * len, z * len);
 }
 
 void Vec3::normalize() {

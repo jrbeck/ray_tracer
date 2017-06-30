@@ -39,16 +39,17 @@ public:
   bool operator==(const Vec3& a) const;
   bool operator!=(const Vec3& a) const;
 
-  void print(const char* string) const;
+  void print() const;
+  void print(const char* label) const;
   void set(const VEC3_DATA_TYPE& value);
   VEC3_DATA_TYPE mag() const;
 
   static VEC3_DATA_TYPE dist(const Vec3& a, const Vec3& b);
   Vec3 unit() const;
   void normalize();
-  Vec3 cross(const Vec3& a, const Vec3& b);
+  static Vec3 cross(const Vec3& a, const Vec3& b);
   Vec3 project(const Vec3& a, const Vec3& b);
-  Vec3 lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t);
+  static Vec3 lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t);
   // Vec3 random(VEC3_DATA_TYPE length);
   // Vec3 getLookVector(VEC3_DATA_TYPE facing, VEC3_DATA_TYPE incline);
   // Vec3 rotateX(const Vec3& a, VEC3_DATA_TYPE angle);
