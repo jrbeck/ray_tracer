@@ -58,17 +58,19 @@ void showIt(RayTracer* rayTracer) {
 }
 
 int main(int argc, char** argv) {
-  int screenW = 5;
-  int screenH = 5;
+  int screenW = 512;
+  int screenH = 512;
 
-  // RayTracer* rayTracer = new RayTracer(screenW, screenH);
-  //
-  // showIt(rayTracer);
-  //
-  // // rayTracer->printResults();
-  // rayTracer->saveOutput();
-  //
-  // delete rayTracer;
+  RayTracer* rayTracer = new RayTracer(screenW, screenH);
+
+  showIt(rayTracer);
+
+  // rayTracer->printResults();
+  rayTracer->saveOutput();
+
+  delete rayTracer;
+
+  // *********************************************************
 
   Vec3 position(0.0f, 0.0f, 0.0f), target(1.0f, 0.1f, 0.0f), up(0.0f, 1.0f, 0.0f);
   CAMERA_FLOAT_T fieldOfView = M_PI * 0.5;
@@ -77,11 +79,6 @@ int main(int argc, char** argv) {
   Camera3* camera = new Camera3(position, target, up, fieldOfView, aspectRatio);
 
   target.print("Target");
-
-  // Vec3 topLeft = camera->viewTopLeft();
-  // topLeft.print("TL");
-  // Vec3 bottomRight = camera->viewBottomRight();
-  // bottomRight.print("BR");
 
   Vec3 viewport[4];
   camera->viewport(viewport);
@@ -104,4 +101,9 @@ int main(int argc, char** argv) {
   }
 
   delete camera;
+
+  // char meh[1000];
+  // scanf("%s", meh);
+
+  return 0;
 }

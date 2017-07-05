@@ -1,0 +1,35 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+/Debug
+/Release
+
+/ray_tracer/Debug
+/ray_tracer/Release
+
+*.suo
+*.user
+
+# OS junk files
+[Tt]humbs.db
+*.DS_Store
+ray_tracer.sdf
+ray_tracer.opensdf
+
+# vs code
+.vscode
+
+# vs 2017
+.vs
