@@ -8,7 +8,7 @@ RayTracer::RayTracer(int width, int height) :
   mOutput = new ImageBuffer();
   mOutput->resize(mWidth, mHeight);
 
-  Vec3 position(2.0, 2.0, 0.0), target(0.2, 0.0, 0.0), up(0.0, 1.0, 0.0);
+  Vec3 position(2.0, 15.0, 0.0), target(0.2, 0.0, 0.0), up(0.0, 1.0, 0.0);
   VEC3_DATA_TYPE fieldOfView = M_PI * 0.5;
   VEC3_DATA_TYPE aspectRatio = (VEC3_DATA_TYPE)mWidth / (VEC3_DATA_TYPE)mHeight;
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
@@ -17,6 +17,15 @@ RayTracer::RayTracer(int width, int height) :
   mScene->addShape(new Sphere(Vec3(0.0, 0.0, 0.0), 1.0));
   mScene->addShape(new Sphere(Vec3(1.0, 0.0, 0.0), 0.5));
   mScene->addShape(new Sphere(Vec3(1.0, 1.0, 0.0), 0.75));
+
+  PseudoRandom pseudoRandom = PseudoRandom(5);
+  for (int i = 0; i < 10; ++i) {
+    VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
+    VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
+    VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);
+    VEC3_DATA_TYPE r = pseudoRandom.nextDouble(0.5, 2.0);
+    mScene->addShape(new Sphere(Vec3(x, y, z), r));
+  }
 
   mAngle = 0.0;
 }
@@ -38,8 +47,8 @@ RayTracer::~RayTracer() {
 
 void RayTracer::drawFrame() const {
   mAngle += 0.1;
-  mCamera->mPosition.x = 5.0 * cos(mAngle);
-  mCamera->mPosition.z = 5.0 * sin(mAngle);
+  mCamera->mPosition.x = 15.0 * cos(mAngle);
+  mCamera->mPosition.z = 15.0 * sin(mAngle);
   Vec3 viewport[4];
   mCamera->viewport(viewport);
 
@@ -54,6 +63,7 @@ void RayTracer::drawFrame() const {
   Intersection intersection, tempIntersection;
   VEC3_DATA_TYPE intersectionDistance, tempIntersectionDistance;
   bool intersectionResult, tempIntersectionResult;
+  size_t intersectionShapeIndex;
 
   for (unsigned j = 0; j < mHeight; j++) {
     leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (double)j / ((double)(mHeight - 1.0)));
@@ -64,24 +74,40 @@ void RayTracer::drawFrame() const {
 
       intersectionResult = false;
       intersectionDistance = 1000000.0;
-      for (size_t i = 0; i < mScene->mShapes.size(); ++i) {
-        tempIntersectionResult = mScene->mShapes[i]->getIntersection(&ray, &tempIntersection);
+      for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size(); ++shapeIndex) {
+        tempIntersectionResult = mScene->mShapes[shapeIndex]->getIntersection(&ray, &tempIntersection);
         if (tempIntersectionResult) {
           tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
           if (tempIntersectionDistance < intersectionDistance) {
             intersectionDistance = tempIntersectionDistance;
             intersectionResult = true;
             intersection = tempIntersection;
+            intersectionShapeIndex = shapeIndex;
           }
         }
       }
 
       if (intersectionResult) {
-        lightAngle = (lightSource - intersection.mPosition).unit();
-        lightStrength = fmax(0.0, lightAngle * intersection.mNormal);
+        // test for shadow
+        bool shadowIntersectionResult = false;
+        Ray3 shadowRay = Ray3(intersection.mPosition, (lightSource - intersection.mPosition).unit());
+        for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size() && !shadowIntersectionResult; ++shapeIndex) {
+          if (shapeIndex == intersectionShapeIndex) {
+            continue;
+          }
+          shadowIntersectionResult = shadowIntersectionResult || mScene->mShapes[shapeIndex]->getIntersection(&shadowRay, &tempIntersection);
+        }
+
+        if (shadowIntersectionResult) {
+          lightStrength = AMBIENT_LIGHT_STRENGTH;
+        }
+        else {
+          lightAngle = (lightSource - intersection.mPosition).unit();
+          lightStrength = fmax(AMBIENT_LIGHT_STRENGTH, lightAngle * intersection.mNormal);
+        }
         mOutput->setRgb(i, j,
-          255.0 * lightStrength,
-          255.0 * lightStrength,
+          128.0 * lightStrength,
+          128.0 * lightStrength,
           255.0 * lightStrength
         );
       }
@@ -91,6 +117,10 @@ void RayTracer::drawFrame() const {
     }
   }
 }
+
+// bool RayTracer::traceRay(Ray3* ray, Intersection* intersection) {
+//
+// }
 
 void RayTracer::saveOutput() {
   mOutput->savePng("output_001.png");
