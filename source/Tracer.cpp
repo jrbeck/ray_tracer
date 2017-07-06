@@ -11,6 +11,9 @@
 #include "RayTracer.h"
 #include "ImageBuffer.h"
 #include "math/PseudoRandom.h"
+#include "math/Ray3.h"
+#include "math/Sphere.h"
+#include "math/Intersection.h"
 #include "SdlApp.h"
 
 void showIt(RayTracer* rayTracer) {
@@ -57,20 +60,10 @@ void showIt(RayTracer* rayTracer) {
   sdlApp.quit();
 }
 
-int main(int argc, char** argv) {
+
+void testViewport() {
   int screenW = 512;
   int screenH = 512;
-
-  RayTracer* rayTracer = new RayTracer(screenW, screenH);
-
-  showIt(rayTracer);
-
-  // rayTracer->printResults();
-  rayTracer->saveOutput();
-
-  delete rayTracer;
-
-  // *********************************************************
 
   Vec3 position(0.0f, 0.0f, 0.0f), target(1.0f, 0.1f, 0.0f), up(0.0f, 1.0f, 0.0f);
   CAMERA_FLOAT_T fieldOfView = M_PI * 0.5;
@@ -101,6 +94,36 @@ int main(int argc, char** argv) {
   }
 
   delete camera;
+}
+
+
+void testIntersection() {
+  Ray3 ray = Ray3(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 0.0, 0.0));
+  Sphere sphere = Sphere(Vec3(20.0, 0.0, 0.0), 1.0);
+  Intersection intersection;
+  bool result = sphere.getIntersection(&ray, &intersection);
+  printf("%d\n", result);
+  intersection.mPosition.print("pos");
+  intersection.mNormal.print("norm");
+}
+
+int main(int argc, char** argv) {
+  // int screenW = 512;
+  // int screenH = 512;
+  //
+  // RayTracer* rayTracer = new RayTracer(screenW, screenH);
+  //
+  // showIt(rayTracer);
+  //
+  // // rayTracer->printResults();
+  // rayTracer->saveOutput();
+  //
+  // delete rayTracer;
+
+  // *********************************************************
+
+  testIntersection();
+
 
   // char meh[1000];
   // scanf("%s", meh);

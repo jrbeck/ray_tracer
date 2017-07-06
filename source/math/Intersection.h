@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/Vec3.h"
+#include "Vec3.h"
 
 class Intersection {
 public:
@@ -8,4 +8,5 @@ public:
   Vec3 mNormal;
 
   Intersection();
+  Intersection(Vec3 position, Vec3 normal);
 };

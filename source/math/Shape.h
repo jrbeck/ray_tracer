@@ -1,8 +1,9 @@
 #pragma once
 
-#include "math/Ray3.h"
+#include "Ray3.h"
+#include "Intersection.h"
 
 class Shape {
 public:
-  virtual void getIntersection(const Ray3* ray, Intersection* intersection) = 0;
-}
+  virtual bool getIntersection(const Ray3* ray, Intersection* intersection) = 0;
+};

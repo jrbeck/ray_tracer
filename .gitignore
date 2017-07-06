@@ -33,3 +33,7 @@ ray_tracer.opensdf
 
 # vs 2017
 .vs
+
+# output from build.sh
+tracer
+output_001.png
