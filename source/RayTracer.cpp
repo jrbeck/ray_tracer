@@ -14,6 +14,9 @@ RayTracer::RayTracer(int width, int height) :
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
 
   mScene = new Scene();
+  mScene->addLight(new Light(Vec3(0.0, 15.0, 5.0), Vec3(1.0, 0.0, 0.0)));
+  mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
+
   mScene->addShape(new Sphere(Vec3(0.0, 0.0, 0.0), 1.0));
   mScene->addShape(new Sphere(Vec3(1.0, 0.0, 0.0), 0.5));
   mScene->addShape(new Sphere(Vec3(1.0, 1.0, 0.0), 0.75));
@@ -56,7 +59,25 @@ void RayTracer::drawFrame() const {
   Vec3 pixelPosition;
   Ray3 ray = Ray3(mCamera->mPosition, Vec3(1.0, 0.0, 0.0));
 
-  Vec3 lightSource = Vec3(5.0, 10.0, 5.0);
+  for (unsigned j = 0; j < mHeight; j++) {
+    leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (double)j / ((double)(mHeight - 1.0)));
+    rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (double)j / ((double)(mHeight - 1.0)));
+    // #pragma omp parallel for
+    for (unsigned i = 0; i <  mWidth; i++) {
+      pixelPosition = Vec3::lerp(leftEdge, rightEdge, (double)i / ((double)(mWidth - 1.0)));
+      ray.mDirection = (pixelPosition - mCamera->mPosition).unit();
+
+      Vec3 color = RayTracer::traceRay(ray);
+      mOutput->setRgb(i, j,
+        255.0 * fmin(color.x, 1.0),
+        255.0 * fmin(color.y, 1.0),
+        255.0 * fmin(color.z, 1.0)
+      );
+    }
+  }
+}
+
+Vec3 RayTracer::traceRay(const Ray3& ray) const {
   Vec3 lightAngle;
   VEC3_DATA_TYPE lightStrength;
 
@@ -65,62 +86,48 @@ void RayTracer::drawFrame() const {
   bool intersectionResult, tempIntersectionResult;
   size_t intersectionShapeIndex;
 
-  for (unsigned j = 0; j < mHeight; j++) {
-    leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (double)j / ((double)(mHeight - 1.0)));
-    rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (double)j / ((double)(mHeight - 1.0)));
-    for (unsigned i = 0; i <  mWidth; i++) {
-      pixelPosition = Vec3::lerp(leftEdge, rightEdge, (double)i / ((double)(mWidth - 1.0)));
-      ray.mDirection = (pixelPosition - mCamera->mPosition).unit();
-
-      intersectionResult = false;
-      intersectionDistance = 1000000.0;
-      for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size(); ++shapeIndex) {
-        tempIntersectionResult = mScene->mShapes[shapeIndex]->getIntersection(&ray, &tempIntersection);
-        if (tempIntersectionResult) {
-          tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
-          if (tempIntersectionDistance < intersectionDistance) {
-            intersectionDistance = tempIntersectionDistance;
-            intersectionResult = true;
-            intersection = tempIntersection;
-            intersectionShapeIndex = shapeIndex;
-          }
-        }
-      }
-
-      if (intersectionResult) {
-        // test for shadow
-        bool shadowIntersectionResult = false;
-        Ray3 shadowRay = Ray3(intersection.mPosition, (lightSource - intersection.mPosition).unit());
-        for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size() && !shadowIntersectionResult; ++shapeIndex) {
-          if (shapeIndex == intersectionShapeIndex) {
-            continue;
-          }
-          shadowIntersectionResult = shadowIntersectionResult || mScene->mShapes[shapeIndex]->getIntersection(&shadowRay, &tempIntersection);
-        }
-
-        if (shadowIntersectionResult) {
-          lightStrength = AMBIENT_LIGHT_STRENGTH;
-        }
-        else {
-          lightAngle = (lightSource - intersection.mPosition).unit();
-          lightStrength = fmax(AMBIENT_LIGHT_STRENGTH, lightAngle * intersection.mNormal);
-        }
-        mOutput->setRgb(i, j,
-          128.0 * lightStrength,
-          128.0 * lightStrength,
-          255.0 * lightStrength
-        );
-      }
-      else {
-        mOutput->setRgb(i, j, 0, 0, 127);
+  intersectionResult = false;
+  intersectionDistance = 1000000.0;
+  for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size(); ++shapeIndex) {
+    tempIntersectionResult = mScene->mShapes[shapeIndex]->getIntersection(&ray, &tempIntersection);
+    if (tempIntersectionResult) {
+      tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
+      if (tempIntersectionDistance < intersectionDistance) {
+        intersectionDistance = tempIntersectionDistance;
+        intersectionResult = true;
+        intersection = tempIntersection;
+        intersectionShapeIndex = shapeIndex;
       }
     }
   }
-}
 
-// bool RayTracer::traceRay(Ray3* ray, Intersection* intersection) {
-//
-// }
+  if (!intersectionResult) {
+    return Vec3(0.0, 0.0, 0.0);
+  }
+
+  // figure out what color it is
+  Vec3 lightAccumulator = Vec3(AMBIENT_LIGHT_STRENGTH, AMBIENT_LIGHT_STRENGTH, AMBIENT_LIGHT_STRENGTH);
+
+  for (size_t lightIndex = 0; lightIndex < mScene->mLights.size(); ++lightIndex) {
+    Light* light = mScene->mLights[lightIndex];
+    bool shadowIntersectionResult = false;
+    Ray3 shadowRay = Ray3(intersection.mPosition, (light->mPosition - intersection.mPosition).unit());
+    for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size() && !shadowIntersectionResult; ++shapeIndex) {
+      if (shapeIndex == intersectionShapeIndex) {
+        continue;
+      }
+      shadowIntersectionResult = shadowIntersectionResult || mScene->mShapes[shapeIndex]->getIntersection(&shadowRay, &tempIntersection);
+    }
+
+    if (!shadowIntersectionResult) {
+      lightAngle = (light->mPosition - intersection.mPosition).unit();
+      lightStrength = fmax(0.0, lightAngle * intersection.mNormal);
+      lightAccumulator += (light->mColor * lightStrength);
+    }
+  }
+
+  return lightAccumulator;
+}
 
 void RayTracer::saveOutput() {
   mOutput->savePng("output_001.png");

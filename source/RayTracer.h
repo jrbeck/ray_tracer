@@ -22,6 +22,8 @@ public:
   ImageBuffer* getOutput();
 
 private:
+  Vec3 traceRay(const Ray3& ray) const;
+
   unsigned mWidth, mHeight;
   mutable VEC3_DATA_TYPE mAngle;
   ImageBuffer* mOutput;

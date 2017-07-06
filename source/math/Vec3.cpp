@@ -53,12 +53,18 @@ Vec3 Vec3::operator-(const Vec3& a) const {
   return Vec3(x - a.x, y - a.y, z - a.z);
 }
 
-// Vec3& operator+=(const Vec3 &a);
-// Vec3& operator-=(const Vec3 &a);
-// Vec3& operator/=(const Vec3 &a);
-// Vec3& operator/=(const VEC3_DATA_TYPE a);
-// Vec3& operator*=(const VEC3_DATA_TYPE a);
-// friend Vec3  operator*(const VEC3_DATA_TYPE a, const Vec3 b);
+Vec3& Vec3::operator+=(const Vec3 &a) {
+  x += a.x;
+  y += a.y;
+  z += a.z;
+  return *this;
+}
+
+// Vec3& Vec3::operator-=(const Vec3 &a);
+// Vec3& Vec3::operator/=(const Vec3 &a);
+// Vec3& Vec3::operator/=(const VEC3_DATA_TYPE a);
+// Vec3& Vec3::operator*=(const VEC3_DATA_TYPE a);
+// friend Vec3 Vec3::operator*(const VEC3_DATA_TYPE a, const Vec3 b);
 
 bool Vec3::isEqual(const Vec3& a) const {
   return (x == a.x) && (y == a.y) && (z == a.z);

@@ -27,7 +27,7 @@ public:
   Vec3 operator/(const VEC3_DATA_TYPE a) const;
   Vec3 operator+(const Vec3& a) const;
   Vec3 operator-(const Vec3& a) const;
-  // Vec3& operator+=(const Vec3& a);
+  Vec3& operator+=(const Vec3& a);
   // Vec3& operator-=(const Vec3& a);
   // Vec3& operator/=(const Vec3& a);
   // Vec3& operator/=(const VEC3_DATA_TYPE a);
