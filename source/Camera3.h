@@ -14,15 +14,14 @@ enum ViewportCorners {
 
 class Camera3 {
 public:
-  Camera3(Vec3 postion, Vec3 target, Vec3 up, CAMERA_FLOAT_T fieldOfView, CAMERA_FLOAT_T aspectRatio);
-
-  void viewport(Vec3* vec3s) const;
-
-private:
   Vec3 mPosition;
   Vec3 mTarget;
   Vec3 mUp;
 
   CAMERA_FLOAT_T mFieldOfView;
   CAMERA_FLOAT_T mAspectRatio;
+
+  Camera3(Vec3 postion, Vec3 target, Vec3 up, CAMERA_FLOAT_T fieldOfView, CAMERA_FLOAT_T aspectRatio);
+
+  void viewport(Vec3* vec3s) const;
 };

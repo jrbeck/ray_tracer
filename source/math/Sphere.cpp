@@ -24,12 +24,14 @@ bool Sphere::getIntersection(const Ray3* ray, Intersection* intersection) {
   VEC3_DATA_TYPE t = (-B - discriminant) * (.5 * A);
   if (t > 0) {
     ray->compute(t, &(intersection->mPosition));
+    intersection->mNormal = (intersection->mPosition - mCenter).unit();
     return true;
   }
 
   t = (-B + discriminant) * (.5 * A);
   if (t > 0) {
     ray->compute(t, &(intersection->mPosition));
+    intersection->mNormal = (intersection->mPosition - mCenter).unit();
     return true;
   }
 

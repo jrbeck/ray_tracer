@@ -53,6 +53,9 @@
     <ClCompile Include="source\lib\lodepng.cpp">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
+    <ClCompile Include="source\math\Intersection.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\math\PseudoRandom.h">
@@ -87,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="source\SdlApp.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\math\Intersection.h">
+      <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -17,7 +17,7 @@ int SdlApp::init(unsigned width, unsigned height) {
     return 1;
   }
 
-  mSdlWindow = SDL_CreateWindow("gothic", 100, 100, width, height, SDL_WINDOW_SHOWN);
+  mSdlWindow = SDL_CreateWindow("SdlApp", 100, 100, width, height, SDL_WINDOW_SHOWN);
   if (mSdlWindow == nullptr) {
     std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
     SDL_Quit();

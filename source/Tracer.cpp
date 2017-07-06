@@ -98,31 +98,38 @@ void testViewport() {
 
 
 void testIntersection() {
-  Ray3 ray = Ray3(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 0.0, 0.0));
-  Sphere sphere = Sphere(Vec3(20.0, 0.0, 0.0), 1.0);
+  Ray3 ray = Ray3(Vec3(0.0, 0.0, 0.0), Vec3(-1.0, 0.0, 0.0));
+  Sphere sphere = Sphere(Vec3(20.0, 0.5, 0.0), 1.0);
   Intersection intersection;
   bool result = sphere.getIntersection(&ray, &intersection);
   printf("%d\n", result);
-  intersection.mPosition.print("pos");
-  intersection.mNormal.print("norm");
+  if (result) {
+    intersection.mPosition.print("pos");
+    intersection.mNormal.print("norm");
+  }
 }
 
 int main(int argc, char** argv) {
-  // int screenW = 512;
-  // int screenH = 512;
-  //
-  // RayTracer* rayTracer = new RayTracer(screenW, screenH);
-  //
-  // showIt(rayTracer);
-  //
-  // // rayTracer->printResults();
-  // rayTracer->saveOutput();
-  //
-  // delete rayTracer;
+  int screenW = 512;
+  int screenH = 512;
+
+  // testIntersection();
+
 
   // *********************************************************
 
-  testIntersection();
+
+  RayTracer* rayTracer = new RayTracer(screenW, screenH);
+  rayTracer->drawFrame();
+
+  showIt(rayTracer);
+
+  rayTracer->saveOutput();
+
+  delete rayTracer;
+
+  // *********************************************************
+
 
 
   // char meh[1000];
