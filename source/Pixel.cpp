@@ -54,7 +54,7 @@ void Pixel::scale(float scalar) {
 
 float Pixel::pivotRgb(float value) const {
     if (value > 0.04045) {
-      return pow(((value + 0.055 ) / 1.055 ), 2.4);
+      return pow(((value + 0.055) / 1.055), 2.4);
     }
     return value / 12.92;
 }
