@@ -1,13 +1,15 @@
 #pragma once
 
-#include "Camera.h"
-#include "Object.h"
+#include <vector>
+
+#include "math/Shape.h"
 
 class Scene {
 public:
+  std::vector<Shape*> mShapes;
+
   Scene();
   ~Scene();
 
-private:
-  Camera
-}
+  void addShape(Shape* shape);
+};

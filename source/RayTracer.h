@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ImageBuffer.h"
+#include "Scene.h"
 #include "math/Vec3.h"
 #include "math/Ray3.h"
 #include "math/Sphere.h"
@@ -19,7 +20,9 @@ public:
 
 private:
   unsigned mWidth, mHeight;
+  mutable VEC3_DATA_TYPE mAngle;
   ImageBuffer* mOutput;
 
   Camera3* mCamera;
+  Scene* mScene;
 };

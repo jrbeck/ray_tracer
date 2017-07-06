@@ -26,6 +26,7 @@ void showIt(RayTracer* rayTracer) {
   SDL_Event e;
   bool quit = false;
   while (!quit) {
+    rayTracer->drawFrame();
     sdlApp.drawFrame(rayTracer->getOutput());
 
     while (SDL_PollEvent(&e)) {
@@ -38,19 +39,12 @@ void showIt(RayTracer* rayTracer) {
             quit = true;
             break;
           case SDLK_q:
-            // ditherDistance++;
-            // printf("dither: %d\n", ditherDistance);
             break;
           case SDLK_a:
-            // if (ditherDistance > 0) {
-            //   ditherDistance--;
-            // }
-            // printf("dither: %d\n", ditherDistance);
             break;
           default:
             break;
         }
-
       }
       if (e.type == SDL_MOUSEBUTTONDOWN) {
       }
@@ -66,8 +60,8 @@ void testViewport() {
   int screenH = 512;
 
   Vec3 position(0.0f, 0.0f, 0.0f), target(1.0f, 0.1f, 0.0f), up(0.0f, 1.0f, 0.0f);
-  CAMERA_FLOAT_T fieldOfView = M_PI * 0.5;
-  CAMERA_FLOAT_T aspectRatio = 1.0;
+  VEC3_DATA_TYPE fieldOfView = M_PI * 0.5;
+  VEC3_DATA_TYPE aspectRatio = 1.0;
 
   Camera3* camera = new Camera3(position, target, up, fieldOfView, aspectRatio);
 
@@ -110,30 +104,20 @@ void testIntersection() {
 }
 
 int main(int argc, char** argv) {
-  int screenW = 512;
-  int screenH = 512;
+  int screenW = 640;
+  int screenH = 480;
 
+  // testViewport();
   // testIntersection();
-
 
   // *********************************************************
 
-
   RayTracer* rayTracer = new RayTracer(screenW, screenH);
-  rayTracer->drawFrame();
-
   showIt(rayTracer);
-
   rayTracer->saveOutput();
-
   delete rayTracer;
 
   // *********************************************************
-
-
-
-  // char meh[1000];
-  // scanf("%s", meh);
 
   return 0;
 }
