@@ -17,12 +17,8 @@ RayTracer::RayTracer(int width, int height) :
   mScene->addLight(new Light(Vec3(0.0, 15.0, 5.0), Vec3(1.0, 0.0, 0.0)));
   mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
 
-  mScene->addShape(new Sphere(Vec3(0.0, 0.0, 0.0), 1.0));
-  mScene->addShape(new Sphere(Vec3(1.0, 0.0, 0.0), 0.5));
-  mScene->addShape(new Sphere(Vec3(1.0, 1.0, 0.0), 0.75));
-
-  PseudoRandom pseudoRandom = PseudoRandom(5);
-  for (int i = 0; i < 10; ++i) {
+  PseudoRandom pseudoRandom = PseudoRandom(6);
+  for (int i = 0; i < 20; ++i) {
     VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
     VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
     VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);
@@ -56,16 +52,14 @@ void RayTracer::drawFrame() const {
   mCamera->viewport(viewport);
 
   Vec3 leftEdge, rightEdge;
-  Vec3 pixelPosition;
-  Ray3 ray = Ray3(mCamera->mPosition, Vec3(1.0, 0.0, 0.0));
 
   for (unsigned j = 0; j < mHeight; j++) {
     leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (double)j / ((double)(mHeight - 1.0)));
     rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (double)j / ((double)(mHeight - 1.0)));
-    // #pragma omp parallel for
-    for (unsigned i = 0; i <  mWidth; i++) {
-      pixelPosition = Vec3::lerp(leftEdge, rightEdge, (double)i / ((double)(mWidth - 1.0)));
-      ray.mDirection = (pixelPosition - mCamera->mPosition).unit();
+    #pragma omp parallel for
+    for (int i = 0; i <  mWidth; i++) {
+      Vec3 pixelPosition = Vec3::lerp(leftEdge, rightEdge, (double)i / ((double)(mWidth - 1.0)));
+      Ray3 ray = Ray3(mCamera->mPosition, (pixelPosition - mCamera->mPosition).unit());
 
       Vec3 color = RayTracer::traceRay(ray);
       mOutput->setRgb(i, j,

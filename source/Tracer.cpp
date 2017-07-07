@@ -104,8 +104,8 @@ void testIntersection() {
 }
 
 int main(int argc, char** argv) {
-  int screenW = 512;
-  int screenH = 512;
+  int screenW = 1024;
+  int screenH = 1024;
 
   // testViewport();
   // testIntersection();

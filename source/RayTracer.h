@@ -9,7 +9,7 @@
 #include "Camera3.h"
 #include "math/PseudoRandom.h"
 
-#define AMBIENT_LIGHT_STRENGTH (0.1)
+#define AMBIENT_LIGHT_STRENGTH (0.1 )
 
 class RayTracer {
 public:

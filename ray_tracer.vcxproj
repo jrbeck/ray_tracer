@@ -93,6 +93,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -100,6 +101,8 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\lib\x86\sdl</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_mixer.lib;SDL2_image.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -107,6 +110,7 @@
     <ClCompile Include="source\ImageBuffer.cpp" />
     <ClCompile Include="source\lib\lodepng.cpp" />
     <ClCompile Include="source\math\Intersection.cpp" />
+    <ClCompile Include="source\math\Light.cpp" />
     <ClCompile Include="source\math\PseudoRandom.cpp" />
     <ClCompile Include="source\math\Ray3.cpp" />
     <ClCompile Include="source\math\Sphere.cpp" />
@@ -122,6 +126,7 @@
     <ClInclude Include="source\ImageBuffer.h" />
     <ClInclude Include="source\lib\lodepng.h" />
     <ClInclude Include="source\math\Intersection.h" />
+    <ClInclude Include="source\math\Light.h" />
     <ClInclude Include="source\math\PseudoRandom.h" />
     <ClInclude Include="source\math\Ray3.h" />
     <ClInclude Include="source\math\Sphere.h" />
