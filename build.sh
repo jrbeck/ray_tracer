@@ -15,4 +15,4 @@ g++ \
   source/math/Intersection.cpp \
   source/math/PseudoRandom.cpp \
   source/lib/lodepng.cpp \
-  -lSDL2 -ansi -pedantic -Wall -Wextra -O3 -o tracer
+  -lSDL2 -ansi -pedantic -Wall -Wextra -O3 -std=c++11 -o tracer

@@ -23,11 +23,15 @@ void showIt(RayTracer* rayTracer) {
     return;
   }
 
+  Uint32 startTicks = SDL_GetTicks();
+  Uint32 frameCount = 0;
+
   SDL_Event e;
   bool quit = false;
   while (!quit) {
     rayTracer->drawFrame();
     sdlApp.drawFrame(rayTracer->getOutput());
+    frameCount++;
 
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
@@ -50,6 +54,9 @@ void showIt(RayTracer* rayTracer) {
       }
     }
   }
+
+  Uint32 endTicks = SDL_GetTicks();
+  printf("average FPS: %.3f\n", ((double)(1000 * frameCount) / (double)(endTicks - startTicks)));
 
   sdlApp.quit();
 }
