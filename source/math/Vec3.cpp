@@ -97,7 +97,7 @@ void Vec3::set(const VEC3_DATA_TYPE& value) {
   x = y = z = value;
 }
 
-VEC3_DATA_TYPE Vec3::mag() const {
+VEC3_DATA_TYPE Vec3::length() const {
   return sqrt((x * x) + (y * y) + (z * z));
 }
 
@@ -132,6 +132,18 @@ Vec3 Vec3::cross(const Vec3& a, const Vec3& b) {
     (a.z * b.x) - (a.x * b.z),
     (a.x * b.y) - (a.y * b.x)
   );
+}
+
+Vec3 Vec3::cross(const Vec3& other) {
+  return Vec3(
+    (y * other.z) - (z * other.y),
+    (z * other.x) - (x * other.z),
+    (x * other.y) - (y * other.x)
+  );
+}
+
+VEC3_DATA_TYPE Vec3::dot(const Vec3& other) {
+  return (x * other.x) + (y * other.y) + (z * other.z);
 }
 
 Vec3 Vec3::project(const Vec3& a, const Vec3& b) {
@@ -216,3 +228,9 @@ Vec3 Vec3::lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t) {
 //
 //   return r;
 // }
+
+
+// assumption: normal is a unit vector
+void Vec3::reflect(Vec3* normal, Vec3* result) const {
+  *result = *this - (*normal * ((*this * *normal) * 2));
+}

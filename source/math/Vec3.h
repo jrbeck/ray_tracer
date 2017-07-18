@@ -42,12 +42,14 @@ public:
   void print() const;
   void print(const char* label) const;
   void set(const VEC3_DATA_TYPE& value);
-  VEC3_DATA_TYPE mag() const;
+  VEC3_DATA_TYPE length() const;
 
   static VEC3_DATA_TYPE dist(const Vec3& a, const Vec3& b);
   Vec3 unit() const;
   void normalize();
   static Vec3 cross(const Vec3& a, const Vec3& b);
+  Vec3 cross(const Vec3& other);
+  VEC3_DATA_TYPE dot(const Vec3& other);
   Vec3 project(const Vec3& a, const Vec3& b);
   static Vec3 lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t);
   // Vec3 random(VEC3_DATA_TYPE length);
@@ -55,4 +57,6 @@ public:
   // Vec3 rotateX(const Vec3& a, VEC3_DATA_TYPE angle);
   // Vec3 rotateY(const Vec3& a, VEC3_DATA_TYPE angle);
   // Vec3 rotateZ(const Vec3& a, VEC3_DATA_TYPE angle);
+
+  void reflect(Vec3* normal, Vec3* result) const;
 };

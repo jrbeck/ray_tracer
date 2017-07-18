@@ -13,7 +13,7 @@ void Camera3::viewport(Vec3* vec3s) const {
   Vec3 left = Vec3::cross(look, mUp);
   Vec3 up = Vec3::cross(left, look);
 
-  VEC3_DATA_TYPE halfScreenWidth = look.mag() * sin(mFieldOfView * 0.5);
+  VEC3_DATA_TYPE halfScreenWidth = look.length() * sin(mFieldOfView * 0.5);
   VEC3_DATA_TYPE halfScreenHeight = halfScreenWidth / mAspectRatio;
 
   Vec3 leftVec = left.unit() * halfScreenWidth;

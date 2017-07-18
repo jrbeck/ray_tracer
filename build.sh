@@ -12,6 +12,8 @@ g++ \
   source/math/Ray3.cpp \
   source/math/Light.cpp \
   source/math/Sphere.cpp \
+  source/math/Triangle.cpp \
+  source/math/Mesh.cpp \
   source/math/Intersection.cpp \
   source/math/PseudoRandom.cpp \
   source/lib/lodepng.cpp \

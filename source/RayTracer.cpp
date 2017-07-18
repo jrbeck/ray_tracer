@@ -14,14 +14,14 @@ RayTracer::RayTracer(int width, int height) :
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
 
   mScene = new Scene();
-  mScene->addLight(new Light(Vec3(0.0, 15.0, 5.0), Vec3(1.0, 0.0, 0.0)));
-  mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
-  mScene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0)));
+  // mScene->addLight(new Light(Vec3(0.0, 15.0, 5.0), Vec3(1.0, 0.0, 0.0)));
+  // mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
+  // mScene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0)));
   mScene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0)));
-  mScene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0)));
+  // mScene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0)));
 
   PseudoRandom pseudoRandom = PseudoRandom(6);
-  for (int i = 0; i < 20; ++i) {
+  for (int i = 0; i < 5; ++i) {
     VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
     VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
     VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);

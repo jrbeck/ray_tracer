@@ -13,6 +13,7 @@
 #include "math/PseudoRandom.h"
 #include "math/Ray3.h"
 #include "math/Sphere.h"
+#include "math/Triangle.h"
 #include "math/Intersection.h"
 #include "SdlApp.h"
 
@@ -110,19 +111,46 @@ void testIntersection() {
   }
 }
 
-int main(int argc, char** argv) {
-  int screenW = 1024;
-  int screenH = 1024;
+void testReflection() {
+  Vec3 a = Vec3(1, 0, 0);
+  Vec3 normal = Vec3(-0.7071, 0.7071, 0);
+  Vec3 result; // a - (normal * ((a * normal) * 2));
 
+  a.reflect(&normal, &result);
+  result.print("r");
+}
+
+void testTriangleIntersection() {
+  Triangle tri;
+  tri.mVertices[0] = Vec3(1.0, 1.0, 1.0);
+  tri.mVertices[1] = Vec3(-1.0, 1.0, 1.0);
+  tri.mVertices[2] = Vec3(-1.0, -1.0, 1.0);
+
+  Ray3 ray = Ray3(Vec3(-0.5, 0.5, 0.0), Vec3(0.0, 0.0, 1.0));
+
+  Intersection intersection;
+  bool result = tri.getIntersection(&ray, &intersection);
+  printf("%d\n", result);
+  if (result) {
+    intersection.mPosition.print("pos");
+    intersection.mNormal.print("norm");
+  }
+}
+
+int main() {
   // testViewport();
   // testIntersection();
+  // testReflection();
+  testTriangleIntersection();
 
   // *********************************************************
 
-  RayTracer* rayTracer = new RayTracer(screenW, screenH);
-  showIt(rayTracer);
-  rayTracer->saveOutput();
-  delete rayTracer;
+  // int screenW = 256;
+  // int screenH = 256;
+  // RayTracer* rayTracer = new RayTracer(screenW, screenH);
+  // showIt(rayTracer);
+  // rayTracer->saveOutput();
+  // delete rayTracer;
 
   // *********************************************************
 
