@@ -14,13 +14,13 @@ RayTracer::RayTracer(int width, int height) :
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
 
   mScene = new Scene();
-  // mScene->addLight(new Light(Vec3(0.0, 15.0, 5.0), Vec3(1.0, 0.0, 0.0)));
+  mScene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0)));
   // mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
   // mScene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0)));
   mScene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0)));
   // mScene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0)));
 
-  PseudoRandom pseudoRandom = PseudoRandom(6);
+  PseudoRandom pseudoRandom = PseudoRandom(3);
   for (int i = 0; i < 5; ++i) {
     VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
     VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
@@ -28,6 +28,46 @@ RayTracer::RayTracer(int width, int height) :
     VEC3_DATA_TYPE r = pseudoRandom.nextDouble(0.5, 2.0);
     mScene->addShape(new Sphere(Vec3(x, y, z), r));
   }
+
+
+
+  // TETRAHEDRON
+  Mesh* mesh = new Mesh;
+  Vec3 v[4];
+  int indices[4];
+  v[0] = Vec3(0, 1, 0);
+  v[1] = Vec3(-1, 0, 1);
+  v[2] = Vec3(1, 0, 1);
+  v[3] = Vec3(0.1, 0, -1);
+  for (int i = 0; i < 4; i++) {
+    mesh->addVertex(v[i], &indices[i]);
+  }
+  mesh->addTriangle(indices[0], indices[1], indices[2], nullptr);
+  mesh->addTriangle(indices[0], indices[2], indices[3], nullptr);
+  mesh->addTriangle(indices[0], indices[3], indices[1], nullptr);
+  mesh->addTriangle(indices[1], indices[2], indices[3], nullptr);
+  mScene->addShape(mesh);
+
+
+  // PLANE
+  // Mesh* mesh = new Mesh;
+  mesh = new Mesh;
+  // Vec3 v[4];
+  // int indices[4];
+  VEC3_DATA_TYPE side = 15.0;
+  VEC3_DATA_TYPE y = -5.0;
+  v[0] = Vec3(-side, y, side);
+  v[1] = Vec3(side, y, side);
+  v[2] = Vec3(-side, y, -side);
+  v[3] = Vec3(side, y, -side);
+  for (int i = 0; i < 4; i++) {
+    mesh->addVertex(v[i], &indices[i]);
+  }
+  mesh->addTriangle(indices[0], indices[1], indices[3], nullptr);
+  mesh->addTriangle(indices[3], indices[2], indices[0], nullptr);
+  mScene->addShape(mesh);
+
+
 
   mAngle = 0.0;
 }

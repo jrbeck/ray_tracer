@@ -5,11 +5,9 @@ bool Mesh::getIntersection(const Ray3* ray, Intersection* intersection) {
   Vec3 normal;
   size_t numTriangles = mTriangles.size() / 3;
   for (size_t i = 0; i < numTriangles; i++) {
-    printf("meh\n");
     size_t triangleIndex = i * 3;
     if (Triangle::rayTriangleIntersect(*ray, mVertices[mTriangles[triangleIndex]], mVertices[mTriangles[triangleIndex + 1]], mVertices[mTriangles[triangleIndex + 2]], t)) {
       if (t > 0.0 && t < t_min) {
-        printf("hit!\n");
         t_min = t;
 
         Vec3 v0v1 = mVertices[mTriangles[triangleIndex + 1]] - mVertices[mTriangles[triangleIndex]];

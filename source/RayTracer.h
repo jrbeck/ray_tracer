@@ -7,6 +7,7 @@
 #include "math/Vec3.h"
 #include "math/Ray3.h"
 #include "math/Sphere.h"
+#include "math/Mesh.h"
 #include "math/Intersection.h"
 #include "Camera3.h"
 #include "math/PseudoRandom.h"
