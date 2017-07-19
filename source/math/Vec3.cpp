@@ -109,18 +109,18 @@ VEC3_DATA_TYPE Vec3::dist(const Vec3& a, const Vec3& b) {
 }
 
 Vec3 Vec3::unit() const {
-  VEC3_DATA_TYPE len = sqrt((x * x) + (y * y) + (z * z));
+  VEC3_DATA_TYPE len = (x * x) + (y * y) + (z * z);
   // this is probably not the right way to handle this
   if (len <= 0.0) return Vec3(1, 0, 0);
-  len = 1.0 / len;
+  len = 1.0 / sqrt(len);
   return Vec3(x * len, y * len, z * len);
 }
 
 void Vec3::normalize() {
-  VEC3_DATA_TYPE len = sqrt((x * x) + (y * y) + (z * z));
+  VEC3_DATA_TYPE len = (x * x) + (y * y) + (z * z);
   // this is probably not the right way to handle this
   if (len <= 0.0) return;
-  len = 1.0 / len;
+  len = 1.0 / sqrt(len);
   x *= len;
   y *= len;
   z *= len;

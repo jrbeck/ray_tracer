@@ -59,6 +59,12 @@
     <ClCompile Include="source\math\Light.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
+    <ClCompile Include="source\math\Mesh.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\math\Triangle.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\math\PseudoRandom.h">
@@ -98,6 +104,12 @@
       <Filter>Source Files\math</Filter>
     </ClInclude>
     <ClInclude Include="source\math\Light.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\math\Mesh.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\math\Triangle.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>

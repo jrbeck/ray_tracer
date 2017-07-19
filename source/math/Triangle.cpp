@@ -1,6 +1,5 @@
 #include "Triangle.h"
 
-
 Triangle::Triangle()
 {}
 
@@ -15,7 +14,6 @@ Triangle::Triangle(const Vec3& a, const Vec3& b, const Vec3& c)
   // mNormal =
 }
 
-
 // stolen from:
 // http://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
 bool Triangle::rayTriangleIntersect(
@@ -23,54 +21,74 @@ bool Triangle::rayTriangleIntersect(
     const Vec3& v0, const Vec3& v1, const Vec3& v2,
     VEC3_DATA_TYPE& t)
 {
-    // compute plane's normal
-    Vec3 v0v1 = v1 - v0;
-    Vec3 v0v2 = v2 - v0;
-    // no need to normalize
-    Vec3 N = v0v1.cross(v0v2); // N
-    // VEC3_DATA_TYPE area2 = N.length();
+  printf("debug! -------\n");
+  v0.print("v0");
+  v1.print("v1");
+  v2.print("v2");
+  ray.mOrigin.print("ray.o");
+  ray.mDirection.print("ray.d");
 
-    // Step 1: finding P
+  // compute plane's normal
+  Vec3 v0v1 = v1 - v0;
+  Vec3 v0v2 = v2 - v0;
+  // no need to normalize
+  Vec3 N = v0v1.cross(v0v2); // N
+  // VEC3_DATA_TYPE area2 = N.length();
 
-    // check if ray and plane are parallel ?
-    VEC3_DATA_TYPE NdotRayDirection = N.dot(ray.mDirection);
-    if (fabs(NdotRayDirection) < kEpsilon) {
-        return false; // they are parallel so they don't intersect !
-    }
+  // Step 1: finding P
 
-    // compute d parameter using equation 2
-    VEC3_DATA_TYPE d = N.dot(v0);
+  // check if ray and plane are parallel ?
+  VEC3_DATA_TYPE NdotRayDirection = N.dot(ray.mDirection);
+  if (fabs(NdotRayDirection) < kEpsilon) {
+    return false; // they are parallel so they don't intersect !
+  }
 
-    // compute t (equation 3)
-    t = (N.dot(ray.mOrigin) + d) / NdotRayDirection;
-    // check if the triangle is in behind the ray
-    if (t < 0) return false; // the triangle is behind
+  printf("meh1\n");
 
-    // compute the intersection point using equation 1
-    Vec3 P = ray.mOrigin + (ray.mDirection * t);
+  // compute d parameter using equation 2
+  VEC3_DATA_TYPE d = N.dot(v0);
 
-    // Step 2: inside-outside test
-    Vec3 C; // vector perpendicular to triangle's plane
+  // compute t (equation 3)
+  t = (-N.dot(ray.mOrigin) + d) / NdotRayDirection;
+  printf("t: %.3f\n", t);
+  // check if the triangle is behind the ray
+  if (t < 0) return false; // the triangle is behind
 
-    // edge 0
-    Vec3 edge0 = v1 - v0;
-    Vec3 vp0 = P - v0;
-    C = edge0.cross(vp0);
-    if (N.dot(C) < 0) return false; // P is on the right side
+  printf("meh2\n");
 
-    // edge 1
-    Vec3 edge1 = v2 - v1;
-    Vec3 vp1 = P - v1;
-    C = edge1.cross(vp1);
-    if (N.dot(C) < 0)  return false; // P is on the right side
+  // compute the intersection point using equation 1
+  Vec3 P = ray.mOrigin + (ray.mDirection * t);
 
-    // edge 2
-    Vec3 edge2 = v0 - v2;
-    Vec3 vp2 = P - v2;
-    C = edge2.cross(vp2);
-    if (N.dot(C) < 0) return false; // P is on the right side;
+  P.print("P");
 
-    return true; // this ray hits the triangle
+  // Step 2: inside-outside test
+  Vec3 C; // vector perpendicular to triangle's plane
+
+  // edge 0
+  Vec3 edge0 = v1 - v0;
+  Vec3 vp0 = P - v0;
+  C = edge0.cross(vp0);
+  if (N.dot(C) < 0) return false; // P is on the right side
+
+  printf("meh3\n");
+
+  // edge 1
+  Vec3 edge1 = v2 - v1;
+  Vec3 vp1 = P - v1;
+  C = edge1.cross(vp1);
+  if (N.dot(C) < 0)  return false; // P is on the right side
+
+  printf("meh4\n");
+
+  // edge 2
+  Vec3 edge2 = v0 - v2;
+  Vec3 vp2 = P - v2;
+  C = edge2.cross(vp2);
+  if (N.dot(C) < 0) return false; // P is on the right side;
+
+  printf("meh5\n");
+
+  return true; // this ray hits the triangle
 }
 
 bool Triangle::getIntersection(const Ray3* ray, Intersection* intersection) {

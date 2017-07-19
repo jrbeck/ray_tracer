@@ -14,6 +14,7 @@
 #include "math/Ray3.h"
 #include "math/Sphere.h"
 #include "math/Triangle.h"
+#include "math/Mesh.h"
 #include "math/Intersection.h"
 #include "SdlApp.h"
 
@@ -52,6 +53,8 @@ void showIt(RayTracer* rayTracer) {
         }
       }
       if (e.type == SDL_MOUSEBUTTONDOWN) {
+        Uint32 endTicks = SDL_GetTicks();
+        printf("average FPS: %.3f\n", ((double)(1000 * frameCount) / (double)(endTicks - startTicks)));
       }
     }
   }
@@ -137,20 +140,51 @@ void testTriangleIntersection() {
   }
 }
 
-int main() {
+void testMeshIntersection() {
+  Mesh mesh;
+  Vec3 v[4];
+  int indices[4];
+  v[0] = Vec3(0, 1, 0);
+  v[1] = Vec3(-1, 0, 1);
+  v[2] = Vec3(1, 0, 1);
+  v[3] = Vec3(0.1, 0, -1);
+  for (int i = 0; i < 4; i++) {
+    mesh.addVertex(v[i], &indices[i]);
+  }
+  mesh.addTriangle(indices[0], indices[1], indices[2], nullptr);
+  mesh.addTriangle(indices[0], indices[2], indices[3], nullptr);
+  mesh.addTriangle(indices[0], indices[3], indices[1], nullptr);
+  mesh.addTriangle(indices[1], indices[2], indices[3], nullptr);
+
+  mesh.print();
+
+  // Ray3 ray = Ray3(Vec3(0.0, 0.5, -2.0), Vec3(0.0, 0.0, 1.0));
+  Ray3 ray = Ray3(Vec3(0.0, 0.5, 2.0), Vec3(0.0, 0.0, -1.0));
+
+  Intersection intersection;
+  bool result = mesh.getIntersection(&ray, &intersection);
+  printf("%d\n", result);
+  if (result) {
+    intersection.mPosition.print("pos");
+    intersection.mNormal.print("norm");
+  }
+}
+
+int main(int nargs, char** argv) {
   // testViewport();
   // testIntersection();
   // testReflection();
-  testTriangleIntersection();
+  // testTriangleIntersection();
+  testMeshIntersection();
 
   // *********************************************************
 
-  // int screenW = 256;
-  // int screenH = 256;
-  // RayTracer* rayTracer = new RayTracer(screenW, screenH);
-  // showIt(rayTracer);
-  // rayTracer->saveOutput();
-  // delete rayTracer;
+  int screenW = 256;
+  int screenH = 256;
+  RayTracer* rayTracer = new RayTracer(screenW, screenH);
+  showIt(rayTracer);
+  rayTracer->saveOutput();
+  delete rayTracer;
 
   // *********************************************************
 
