@@ -179,8 +179,8 @@ int main(int nargs, char** argv) {
 
   // *********************************************************
 
-  int screenW = 1024;
-  int screenH = 1024;
+  int screenW = 128;
+  int screenH = 128;
   RayTracer* rayTracer = new RayTracer(screenW, screenH);
   showIt(rayTracer);
   rayTracer->saveOutput();

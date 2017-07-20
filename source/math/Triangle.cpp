@@ -26,7 +26,11 @@ bool Triangle::rayTriangleIntersect(
   Vec3 v0v2 = v2 - v0;
   // no need to normalize
   Vec3 N = v0v1.cross(v0v2); // N
-  // VEC3_DATA_TYPE area2 = N.length();
+
+  // backface culling:
+  if (N.dot(ray.mDirection) >= kEpsilon) {
+    return false;
+  }
 
   // Step 1: finding P
 
