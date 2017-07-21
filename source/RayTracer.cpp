@@ -14,10 +14,10 @@ RayTracer::RayTracer(int width, int height) :
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
 
   mScene = new Scene();
-  mScene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0)));
+  mScene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0), 1000.0));
   // mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
   // mScene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0)));
-  mScene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0)));
+  mScene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0), 250.0));
   // mScene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0)));
 
   PseudoRandom pseudoRandom = PseudoRandom(3);
@@ -88,7 +88,7 @@ RayTracer::~RayTracer() {
 }
 
 void RayTracer::drawFrame() const {
-  mAngle += 0.1;
+  mAngle += 0.02;
   mCamera->mPosition.x = 15.0 * cos(mAngle);
   mCamera->mPosition.z = 15.0 * sin(mAngle);
   Vec3 viewport[4];
@@ -185,8 +185,9 @@ Vec3 RayTracer::traceRay(const Ray3& ray) const {
 
     if (!shadowIntersectionResult) {
       Vec3 intersectionToLight = light->mPosition - intersection.mPosition;
+      VEC3_DATA_TYPE distanceToLight = intersectionToLight.length();
       lightAngle = intersectionToLight.unit();
-      lightStrength = fmax(0.0, lightAngle * intersection.mNormal);
+      lightStrength = light->mStrength * fmax(0.0, lightAngle * intersection.mNormal) / (4.0 * M_PI * distanceToLight * distanceToLight);
       lightAccumulator += (light->mColor * lightStrength);
     }
   }
