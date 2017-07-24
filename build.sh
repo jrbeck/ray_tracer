@@ -11,6 +11,7 @@ g++ \
   source/math/Vec3.cpp \
   source/math/Ray3.cpp \
   source/math/Light.cpp \
+  source/math/Material.cpp \
   source/math/Sphere.cpp \
   source/math/Triangle.cpp \
   source/math/Mesh.cpp \

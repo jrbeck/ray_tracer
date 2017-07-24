@@ -14,9 +14,16 @@
 
 #define AMBIENT_LIGHT_STRENGTH (0.1)
 
+enum RayThreadStates {
+  dormant = 0,
+  working = 1,
+  complete = 2
+};
+
 
 struct RayThread {
   bool active;
+  int state;
   std::thread thread;
   int j;
   Vec3 leftEdge;
@@ -26,7 +33,7 @@ struct RayThread {
 
 class RayTracer {
 public:
-  RayTracer(int width, int height);
+  RayTracer(int width, int height, Scene* scene);
   ~RayTracer();
 
   void drawFrame() const;
@@ -36,11 +43,14 @@ public:
 
 private:
   void drawScanline(RayThread* rayThread) const;
-  Vec3 traceRay(const Ray3& ray) const;
+  Vec3 traceRay(const Ray3& ray, int bounce) const;
+
+  const size_t kNumThreads = 20;
 
   unsigned mWidth, mHeight;
   mutable VEC3_DATA_TYPE mAngle;
   ImageBuffer* mOutput;
+  RayThread* mRayThreads;
 
   Camera3* mCamera;
   Scene* mScene;

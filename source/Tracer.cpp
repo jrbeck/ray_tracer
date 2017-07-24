@@ -10,6 +10,7 @@
 #include "Pixel.h"
 #include "RayTracer.h"
 #include "ImageBuffer.h"
+#include "Scene.h"
 #include "math/PseudoRandom.h"
 #include "math/Ray3.h"
 #include "math/Sphere.h"
@@ -170,21 +171,82 @@ void testMeshIntersection() {
   }
 }
 
+
+Scene* buildTestScene() {
+  Scene* scene = new Scene();
+  scene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0), 1000.0));
+  scene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0), 250.0));
+  scene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0), 250.0));
+  scene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0), 250.0));
+  scene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0), 250.0));
+
+  PseudoRandom pseudoRandom = PseudoRandom(3);
+  for (int i = 0; i < 5; ++i) {
+    VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
+    VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
+    VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);
+    VEC3_DATA_TYPE r = pseudoRandom.nextDouble(0.5, 2.0);
+    scene->addShape(new Sphere(Vec3(x, y, z), r));
+  }
+
+  // TETRAHEDRON
+  Mesh* mesh = new Mesh;
+  Vec3 v[4];
+  int indices[4];
+  v[0] = Vec3(0, 1, 0);
+  v[1] = Vec3(-1, 0, 1);
+  v[2] = Vec3(1, 0, 1);
+  v[3] = Vec3(0.1, 0, -1);
+  for (int i = 0; i < 4; i++) {
+    mesh->addVertex(v[i], &indices[i]);
+  }
+  mesh->addTriangle(indices[0], indices[1], indices[2], nullptr);
+  mesh->addTriangle(indices[0], indices[2], indices[3], nullptr);
+  mesh->addTriangle(indices[0], indices[3], indices[1], nullptr);
+  mesh->addTriangle(indices[1], indices[2], indices[3], nullptr);
+  scene->addShape(mesh);
+
+
+  // PLANE
+  // Mesh* mesh = new Mesh;
+  mesh = new Mesh;
+  // Vec3 v[4];
+  // int indices[4];
+  VEC3_DATA_TYPE side = 15.0;
+  VEC3_DATA_TYPE y = -5.0;
+  v[0] = Vec3(-side, y, side);
+  v[1] = Vec3(side, y, side);
+  v[2] = Vec3(-side, y, -side);
+  v[3] = Vec3(side, y, -side);
+  for (int i = 0; i < 4; i++) {
+    mesh->addVertex(v[i], &indices[i]);
+  }
+  mesh->addTriangle(indices[0], indices[1], indices[3], nullptr);
+  mesh->addTriangle(indices[3], indices[2], indices[0], nullptr);
+  scene->addShape(mesh);
+
+  return scene;
+}
+
+
 int main(int nargs, char** argv) {
   // testViewport();
   // testIntersection();
   // testReflection();
   // testTriangleIntersection();
-  testMeshIntersection();
+  // testMeshIntersection();
 
   // *********************************************************
 
   int screenW = 1024;
   int screenH = 1024;
-  RayTracer* rayTracer = new RayTracer(screenW, screenH);
+
+  Scene* scene = buildTestScene();
+  RayTracer* rayTracer = new RayTracer(screenW, screenH, scene);
   showIt(rayTracer);
   rayTracer->saveOutput();
   delete rayTracer;
+  delete scene;
 
   // *********************************************************
 

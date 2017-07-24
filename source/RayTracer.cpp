@@ -1,74 +1,25 @@
 #include "RayTracer.h"
 
-RayTracer::RayTracer(int width, int height) :
+RayTracer::RayTracer(int width, int height, Scene* scene) :
   mOutput(nullptr),
   mWidth(width),
-  mHeight(height)
+  mHeight(height),
+  mRayThreads(nullptr),
+  mScene(scene)
 {
   mOutput = new ImageBuffer();
   mOutput->resize(mWidth, mHeight);
+
+
+  mRayThreads = new RayThread[kNumThreads];
+  for (unsigned t = 0; t < kNumThreads; t++) {
+    mRayThreads[t].state = RayThreadStates::dormant;
+  }
 
   Vec3 position(2.0, 15.0, 0.0), target(0.2, 0.0, 0.0), up(0.0, 1.0, 0.0);
   VEC3_DATA_TYPE fieldOfView = M_PI * 0.5;
   VEC3_DATA_TYPE aspectRatio = (VEC3_DATA_TYPE)mWidth / (VEC3_DATA_TYPE)mHeight;
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
-
-  mScene = new Scene();
-  mScene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0), 1000.0));
-  // mScene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0)));
-  // mScene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0)));
-  mScene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0), 250.0));
-  // mScene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0)));
-
-  PseudoRandom pseudoRandom = PseudoRandom(3);
-  for (int i = 0; i < 5; ++i) {
-    VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
-    VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
-    VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);
-    VEC3_DATA_TYPE r = pseudoRandom.nextDouble(0.5, 2.0);
-    mScene->addShape(new Sphere(Vec3(x, y, z), r));
-  }
-
-
-
-  // TETRAHEDRON
-  Mesh* mesh = new Mesh;
-  Vec3 v[4];
-  int indices[4];
-  v[0] = Vec3(0, 1, 0);
-  v[1] = Vec3(-1, 0, 1);
-  v[2] = Vec3(1, 0, 1);
-  v[3] = Vec3(0.1, 0, -1);
-  for (int i = 0; i < 4; i++) {
-    mesh->addVertex(v[i], &indices[i]);
-  }
-  mesh->addTriangle(indices[0], indices[1], indices[2], nullptr);
-  mesh->addTriangle(indices[0], indices[2], indices[3], nullptr);
-  mesh->addTriangle(indices[0], indices[3], indices[1], nullptr);
-  mesh->addTriangle(indices[1], indices[2], indices[3], nullptr);
-  mScene->addShape(mesh);
-
-
-  // PLANE
-  // Mesh* mesh = new Mesh;
-  mesh = new Mesh;
-  // Vec3 v[4];
-  // int indices[4];
-  VEC3_DATA_TYPE side = 15.0;
-  VEC3_DATA_TYPE y = -5.0;
-  v[0] = Vec3(-side, y, side);
-  v[1] = Vec3(side, y, side);
-  v[2] = Vec3(-side, y, -side);
-  v[3] = Vec3(side, y, -side);
-  for (int i = 0; i < 4; i++) {
-    mesh->addVertex(v[i], &indices[i]);
-  }
-  mesh->addTriangle(indices[0], indices[1], indices[3], nullptr);
-  mesh->addTriangle(indices[3], indices[2], indices[0], nullptr);
-  mScene->addShape(mesh);
-
-
-
   mAngle = 0.0;
 }
 
@@ -81,9 +32,9 @@ RayTracer::~RayTracer() {
     delete mCamera;
     mCamera = nullptr;
   }
-  if (mScene != nullptr) {
-    delete mScene;
-    mScene = nullptr;
+  if (mRayThreads != nullptr) {
+    delete [] mRayThreads;
+    mRayThreads = nullptr;
   }
 }
 
@@ -96,33 +47,29 @@ void RayTracer::drawFrame() const {
 
   Vec3 leftEdge, rightEdge;
 
-  size_t numThreads = 20;
-  RayThread mainRayThread;
-  RayThread* rayThreads = new RayThread[numThreads];
-
   for (unsigned j = 0; j < mHeight;) {
-    for (unsigned t = 0; (t < numThreads) && (j < mHeight); t++) {
-      rayThreads[t].active = true;
-      rayThreads[t].j = j;
-      rayThreads[t].leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
-      rayThreads[t].rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
-      rayThreads[t].thread = std::thread(&RayTracer::drawScanline, this, &rayThreads[t]);
+    for (unsigned t = 0; (t < kNumThreads) && (j < mHeight); t++) {
+      if (mRayThreads[t].state == RayThreadStates::working) {
+        continue;
+      }
+
+      if (mRayThreads[t].state == RayThreadStates::complete) {
+        mRayThreads[t].thread.join();
+      }
+
+      mRayThreads[t].state = RayThreadStates::working;
+      mRayThreads[t].j = j;
+      mRayThreads[t].leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
+      mRayThreads[t].rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
+      mRayThreads[t].thread = std::thread(&RayTracer::drawScanline, this, &mRayThreads[t]);
       ++j;
     }
+  }
 
-    // if (j < mHeight) {
-    //   mainRayThread.j = j;
-    //   mainRayThread.leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
-    //   mainRayThread.rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
-    //   drawScanline(&mainRayThread);
-    //   ++j;
-    // }
-
-    for (unsigned t = 0; t < numThreads; t++) {
-      if (rayThreads[t].active) {
-        rayThreads[t].thread.join();
-        rayThreads[t].active = false;
-      }
+  for (unsigned t = 0; t < kNumThreads; t++) {
+    if (mRayThreads[t].state == RayThreadStates::working || mRayThreads[t].state == RayThreadStates::complete) {
+      mRayThreads[t].thread.join();
+      mRayThreads[t].state = RayThreadStates::dormant;
     }
   }
 }
@@ -132,16 +79,18 @@ void RayTracer::drawScanline(RayThread* rayThread) const {
     Vec3 pixelPosition = Vec3::lerp(rayThread->leftEdge, rayThread->rightEdge, (VEC3_DATA_TYPE)i / ((VEC3_DATA_TYPE)(mWidth - 1.0)));
     Ray3 ray = Ray3(mCamera->mPosition, (pixelPosition - mCamera->mPosition).unit());
 
-    Vec3 color = traceRay(ray);
+    Vec3 color = traceRay(ray, 0);
     mOutput->setRgb(i, rayThread->j,
       255.0 * fmin(color.x, 1.0),
       255.0 * fmin(color.y, 1.0),
       255.0 * fmin(color.z, 1.0)
     );
   }
+
+  rayThread->state = RayThreadStates::complete;
 }
 
-Vec3 RayTracer::traceRay(const Ray3& ray) const {
+Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
   Vec3 lightAngle;
   VEC3_DATA_TYPE lightStrength;
 
