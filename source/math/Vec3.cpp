@@ -69,7 +69,7 @@ Vec3& Vec3::operator+=(const Vec3 &a) {
 bool Vec3::isEqual(const Vec3& a) const {
   return (x == a.x) && (y == a.y) && (z == a.z);
 }
-bool Vec3::isEqual(const Vec3& a, const float epsilon) const {
+bool Vec3::isEqual(const Vec3& a, const VEC3_DATA_TYPE epsilon) const {
   return (fabs(x - a.x) < epsilon) &&
     (fabs(y - a.y) < epsilon) &&
     (fabs(z - a.z) < epsilon);
@@ -232,5 +232,5 @@ Vec3 Vec3::lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t) {
 
 // assumption: normal is a unit vector
 void Vec3::reflect(Vec3* normal, Vec3* result) const {
-  *result = *this - (*normal * ((*this * *normal) * 2));
+  *result = *this - (*normal * ((*this * *normal) * 2.0));
 }

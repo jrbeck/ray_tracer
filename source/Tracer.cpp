@@ -203,7 +203,7 @@ Scene* buildTestScene() {
   mesh->addTriangle(indices[0], indices[1], indices[2], nullptr);
   mesh->addTriangle(indices[0], indices[2], indices[3], nullptr);
   mesh->addTriangle(indices[0], indices[3], indices[1], nullptr);
-  mesh->addTriangle(indices[1], indices[2], indices[3], nullptr);
+  mesh->addTriangle(indices[1], indices[3], indices[2], nullptr);
   scene->addShape(mesh);
 
 

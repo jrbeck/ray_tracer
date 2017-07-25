@@ -28,9 +28,9 @@ bool Triangle::rayTriangleIntersect(
   Vec3 N = v0v1.cross(v0v2); // N
 
   // backface culling:
-  if (N.dot(ray.mDirection) >= kEpsilon) {
-    return false;
-  }
+  // if (N.dot(ray.mDirection) >= kEpsilon) {
+  //   return false;
+  // }
 
   // Step 1: finding P
 
@@ -78,6 +78,12 @@ bool Triangle::rayTriangleIntersect(
 bool Triangle::getIntersection(const Ray3* ray, Intersection* intersection) {
   VEC3_DATA_TYPE t;
   bool result = rayTriangleIntersect(*ray, mVertices[0], mVertices[1], mVertices[2], t);
-  // intersection->
-  return result;
+  if (!result) {
+    return false;
+  }
+  ray->compute(t, &intersection->mPosition);
+  Vec3 v0v1 = mVertices[1] - mVertices[0];
+  Vec3 v0v2 = mVertices[2] - mVertices[0];
+  intersection->mNormal = v0v1.cross(v0v2).unit();
+  return true;
 }

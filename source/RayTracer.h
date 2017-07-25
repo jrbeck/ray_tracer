@@ -45,7 +45,8 @@ private:
   void drawScanline(RayThread* rayThread) const;
   Vec3 traceRay(const Ray3& ray, int bounce) const;
 
-  const size_t kNumThreads = 20;
+  const size_t kNumThreads = 8;
+  const size_t kMaxBounces = 2;
 
   unsigned mWidth, mHeight;
   mutable VEC3_DATA_TYPE mAngle;

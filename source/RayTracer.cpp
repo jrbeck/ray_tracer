@@ -103,14 +103,15 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
   intersectionDistance = 1000000.0;
   for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size(); ++shapeIndex) {
     tempIntersectionResult = mScene->mShapes[shapeIndex]->getIntersection(&ray, &tempIntersection);
-    if (tempIntersectionResult) {
-      tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
-      if (tempIntersectionDistance < intersectionDistance) {
-        intersectionDistance = tempIntersectionDistance;
-        intersectionResult = true;
-        intersection = tempIntersection;
-        intersectionShapeIndex = shapeIndex;
-      }
+    if (!tempIntersectionResult) {
+      continue;
+    }
+    tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
+    if (tempIntersectionDistance < intersectionDistance) {
+      intersectionDistance = tempIntersectionDistance;
+      intersectionResult = true;
+      intersection = tempIntersection;
+      intersectionShapeIndex = shapeIndex;
     }
   }
 
@@ -127,6 +128,7 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
     Ray3 shadowRay = Ray3(intersection.mPosition, (light->mPosition - intersection.mPosition).unit());
     for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size() && !shadowIntersectionResult; ++shapeIndex) {
       if (shapeIndex == intersectionShapeIndex) {
+        // this poses a problem for self-shadowing meshes
         continue;
       }
       shadowIntersectionResult = shadowIntersectionResult || mScene->mShapes[shapeIndex]->getIntersection(&shadowRay, &tempIntersection);
@@ -139,6 +141,16 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
       lightStrength = light->mStrength * fmax(0.0, lightAngle * intersection.mNormal) / (4.0 * M_PI * distanceToLight * distanceToLight);
       lightAccumulator += (light->mColor * lightStrength);
     }
+  }
+
+  if (bounce < kMaxBounces) {
+    Vec3 bounceDirection;
+    ray.mDirection.reflect(&intersection.mNormal, &bounceDirection);
+    Ray3 bounceRay = Ray3(intersection.mPosition, bounceDirection);
+    // this is to avoid some float errors
+    bounceRay.compute(0.01, &bounceRay.mOrigin);
+    lightAccumulator += traceRay(bounceRay, bounce + 1);
+    // lightAccumulator = lightAccumulator * 0.5;
   }
 
   return lightAccumulator;

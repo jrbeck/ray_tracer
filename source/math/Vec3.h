@@ -35,7 +35,7 @@ public:
   // friend Vec3 operator*(const VEC3_DATA_TYPE a, const Vec3 b);
 
   bool isEqual(const Vec3& a) const;
-  bool isEqual(const Vec3& a, const float epsilon) const;
+  bool isEqual(const Vec3& a, const VEC3_DATA_TYPE epsilon) const;
   bool operator==(const Vec3& a) const;
   bool operator!=(const Vec3& a) const;
 
