@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "math/PseudoRandom.h"
 #include "math/Ray3.h"
+#include "math/Material.h"
 #include "math/Sphere.h"
 #include "math/Triangle.h"
 #include "math/Mesh.h"
@@ -175,19 +176,41 @@ void testMeshIntersection() {
 Scene* buildTestScene() {
   Scene* scene = new Scene();
   scene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0), 1000.0));
-  scene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0), 250.0));
-  scene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0), 250.0));
+  // scene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0), 250.0));
+  // scene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0), 250.0));
   scene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0), 250.0));
-  scene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0), 250.0));
+  // scene->addLight(new Light(Vec3(10.0, 5.0, 5.0), Vec3(0.0, 0.0, 1.0), 250.0));
 
-  PseudoRandom pseudoRandom = PseudoRandom(3);
-  for (int i = 0; i < 5; ++i) {
-    VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
-    VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
-    VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);
-    VEC3_DATA_TYPE r = pseudoRandom.nextDouble(0.5, 2.0);
-    scene->addShape(new Sphere(Vec3(x, y, z), r));
+
+  // material
+  Vec3 diffuseColor = Vec3(0.0, 1.0, 1.0);
+  VEC3_DATA_TYPE reflectivity = 0.1;
+  Material* material = new Material(diffuseColor, reflectivity);
+  scene->addMaterial(material);
+
+
+
+  // PseudoRandom pseudoRandom = PseudoRandom(3);
+  // for (int i = 0; i < 5; ++i) {
+  //   VEC3_DATA_TYPE x = pseudoRandom.nextDouble(-5.0, 5.0);
+  //   VEC3_DATA_TYPE y = pseudoRandom.nextDouble(-5.0, 5.0);
+  //   VEC3_DATA_TYPE z = pseudoRandom.nextDouble(-5.0, 5.0);
+  //   VEC3_DATA_TYPE r = pseudoRandom.nextDouble(0.5, 2.0);
+  //   scene->addShape(new Sphere(Vec3(x, y, z), r));
+  // }
+
+
+
+  for (int j = 0; j < 5; ++j) {
+    for (int i = 0; i < 5; ++i) {
+      VEC3_DATA_TYPE x = (i * 2.0) - 5.0;
+      VEC3_DATA_TYPE y = 2.0;
+      VEC3_DATA_TYPE z = (j * 2.0) - 5.0;
+      VEC3_DATA_TYPE r = 0.5;
+      scene->addShape(new Sphere(Vec3(x, y, z), r));
+    }
   }
+
 
   // TETRAHEDRON
   Mesh* mesh = new Mesh;
@@ -238,8 +261,8 @@ int main(int nargs, char** argv) {
 
   // *********************************************************
 
-  int screenW = 1024;
-  int screenH = 1024;
+  int screenW = 512;
+  int screenH = 512;
 
   Scene* scene = buildTestScene();
   RayTracer* rayTracer = new RayTracer(screenW, screenH, scene);

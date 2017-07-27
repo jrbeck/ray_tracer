@@ -52,6 +52,7 @@ public:
   VEC3_DATA_TYPE dot(const Vec3& other);
   Vec3 project(const Vec3& a, const Vec3& b);
   static Vec3 lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t);
+  Vec3 hadamard(const Vec3& a) const;
   // Vec3 random(VEC3_DATA_TYPE length);
   // Vec3 getLookVector(VEC3_DATA_TYPE facing, VEC3_DATA_TYPE incline);
   // Vec3 rotateX(const Vec3& a, VEC3_DATA_TYPE angle);

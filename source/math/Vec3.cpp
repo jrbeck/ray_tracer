@@ -168,6 +168,14 @@ Vec3 Vec3::lerp(const Vec3& a, const Vec3& b, VEC3_DATA_TYPE t) {
   );
 }
 
+Vec3 Vec3::hadamard(const Vec3& a) const {
+  return Vec3(
+    x * a.x,
+    y * a.y,
+    z * a.z
+  );
+}
+
 // Vec3 Vec3::random(VEC3_DATA_TYPE length) {
 //   Vec3 ret;
 //

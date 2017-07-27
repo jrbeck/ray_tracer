@@ -46,7 +46,7 @@ private:
   Vec3 traceRay(const Ray3& ray, int bounce) const;
 
   const size_t kNumThreads = 8;
-  const size_t kMaxBounces = 2;
+  const size_t kMaxBounces = 6;
 
   unsigned mWidth, mHeight;
   mutable VEC3_DATA_TYPE mAngle;

@@ -16,7 +16,7 @@ RayTracer::RayTracer(int width, int height, Scene* scene) :
     mRayThreads[t].state = RayThreadStates::dormant;
   }
 
-  Vec3 position(2.0, 15.0, 0.0), target(0.2, 0.0, 0.0), up(0.0, 1.0, 0.0);
+  Vec3 position(1.0, 3.0, 0.0), target(0.0, 0.0, 0.0), up(0.0, 1.0, 0.0);
   VEC3_DATA_TYPE fieldOfView = M_PI * 0.5;
   VEC3_DATA_TYPE aspectRatio = (VEC3_DATA_TYPE)mWidth / (VEC3_DATA_TYPE)mHeight;
   mCamera = new Camera3(position, target, up, fieldOfView, aspectRatio);
@@ -40,8 +40,8 @@ RayTracer::~RayTracer() {
 
 void RayTracer::drawFrame() const {
   mAngle += 0.02;
-  mCamera->mPosition.x = 15.0 * cos(mAngle);
-  mCamera->mPosition.z = 15.0 * sin(mAngle);
+  mCamera->mPosition.x = 5.0 * cos(mAngle);
+  mCamera->mPosition.z = 5.0 * sin(mAngle);
   Vec3 viewport[4];
   mCamera->viewport(viewport);
 
@@ -139,7 +139,7 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
       VEC3_DATA_TYPE distanceToLight = intersectionToLight.length();
       lightAngle = intersectionToLight.unit();
       lightStrength = light->mStrength * fmax(0.0, lightAngle * intersection.mNormal) / (4.0 * M_PI * distanceToLight * distanceToLight);
-      lightAccumulator += (light->mColor * lightStrength);
+      lightAccumulator += mScene->mMaterials[0]->mDiffuseColor.hadamard(light->mColor * lightStrength);
     }
   }
 
@@ -149,7 +149,8 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
     Ray3 bounceRay = Ray3(intersection.mPosition, bounceDirection);
     // this is to avoid some float errors
     bounceRay.compute(0.01, &bounceRay.mOrigin);
-    lightAccumulator += traceRay(bounceRay, bounce + 1);
+    VEC3_DATA_TYPE reflectivity = mScene->mMaterials[0]->mReflectivity;
+    lightAccumulator = (lightAccumulator * (1.0 - reflectivity)) + (traceRay(bounceRay, bounce + 1) * reflectivity);
     // lightAccumulator = lightAccumulator * 0.5;
   }
 

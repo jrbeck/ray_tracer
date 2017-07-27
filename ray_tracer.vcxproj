@@ -111,6 +111,7 @@
     <ClCompile Include="source\lib\lodepng.cpp" />
     <ClCompile Include="source\math\Intersection.cpp" />
     <ClCompile Include="source\math\Light.cpp" />
+    <ClCompile Include="source\math\Material.cpp" />
     <ClCompile Include="source\math\Mesh.cpp" />
     <ClCompile Include="source\math\PseudoRandom.cpp" />
     <ClCompile Include="source\math\Ray3.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="source\lib\lodepng.h" />
     <ClInclude Include="source\math\Intersection.h" />
     <ClInclude Include="source\math\Light.h" />
+    <ClInclude Include="source\math\Material.h" />
     <ClInclude Include="source\math\Mesh.h" />
     <ClInclude Include="source\math\PseudoRandom.h" />
     <ClInclude Include="source\math\Ray3.h" />
