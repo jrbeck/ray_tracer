@@ -15,6 +15,8 @@ public:
   Scene();
   ~Scene();
 
+  bool getIntersection(const Ray3& ray, Intersection& intersection);
+
   void addLight(Light* light);
   void addMaterial(Material* material);
   void addShape(Shape* shape);

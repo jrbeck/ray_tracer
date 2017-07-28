@@ -25,6 +25,27 @@ Scene::~Scene() {
   }
 }
 
+bool Scene::getIntersection(const Ray3& ray, Intersection& intersection) {
+  Intersection tempIntersection;
+  bool intersectionResult = false;
+  VEC3_DATA_TYPE intersectionDistance, tempIntersectionDistance;
+  intersectionDistance = 1000000.0;
+
+  for (size_t shapeIndex = 0; shapeIndex < mShapes.size(); ++shapeIndex) {
+    if (!mShapes[shapeIndex]->getIntersection(&ray, &tempIntersection)) {
+      continue;
+    }
+    tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
+    if (tempIntersectionDistance < intersectionDistance) {
+      intersectionDistance = tempIntersectionDistance;
+      intersectionResult = true;
+      intersection = tempIntersection;
+    }
+  }
+
+  return intersectionResult;
+}
+
 void Scene::addLight(Light* light) {
   mLights.push_back(light);
 }

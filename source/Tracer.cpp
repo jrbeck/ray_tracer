@@ -172,10 +172,11 @@ void testMeshIntersection() {
   }
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 Scene* buildTestScene() {
   Scene* scene = new Scene();
-  scene->addLight(new Light(Vec3(0.0, 150.0, 0.0), Vec3(1.0, 0.0, 0.0), 1000.0));
+  scene->addLight(new Light(Vec3(0.0, 15.0, 0.0), Vec3(1.0, 1.0, 1.0), 1000.0));
   // scene->addLight(new Light(Vec3(0.0, 0.0, 5.0), Vec3(0.0, 1.0, 1.0), 250.0));
   // scene->addLight(new Light(Vec3(5.0, 5.0, 0.0), Vec3(1.0, 0.0, 1.0), 250.0));
   scene->addLight(new Light(Vec3(5.0, 0.0, 5.0), Vec3(0.0, 1.0, 0.0), 250.0));
@@ -188,6 +189,10 @@ Scene* buildTestScene() {
   Material* material = new Material(diffuseColor, reflectivity);
   scene->addMaterial(material);
 
+  diffuseColor = Vec3(1.0, 0.0, 0.0);
+  reflectivity = 0.7;
+  Material* material2 = new Material(diffuseColor, reflectivity);
+  scene->addMaterial(material2);
 
 
   // PseudoRandom pseudoRandom = PseudoRandom(3);
@@ -261,8 +266,8 @@ int main(int nargs, char** argv) {
 
   // *********************************************************
 
-  int screenW = 512;
-  int screenH = 512;
+  int screenW = 256;
+  int screenH = 256;
 
   Scene* scene = buildTestScene();
   RayTracer* rayTracer = new RayTracer(screenW, screenH, scene);

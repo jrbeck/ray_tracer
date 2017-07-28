@@ -41,6 +41,7 @@ RayTracer::~RayTracer() {
 void RayTracer::drawFrame() const {
   mAngle += 0.02;
   mCamera->mPosition.x = 5.0 * cos(mAngle);
+  mCamera->mPosition.y = 3.0 + 0.6 * sin(mAngle * 1.2);
   mCamera->mPosition.z = 5.0 * sin(mAngle);
   Vec3 viewport[4];
   mCamera->viewport(viewport);
@@ -96,24 +97,8 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
 
   Intersection intersection, tempIntersection;
   VEC3_DATA_TYPE intersectionDistance, tempIntersectionDistance;
-  bool intersectionResult, tempIntersectionResult;
-  size_t intersectionShapeIndex;
-
-  intersectionResult = false;
-  intersectionDistance = 1000000.0;
-  for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size(); ++shapeIndex) {
-    tempIntersectionResult = mScene->mShapes[shapeIndex]->getIntersection(&ray, &tempIntersection);
-    if (!tempIntersectionResult) {
-      continue;
-    }
-    tempIntersectionDistance = Vec3::dist(ray.mOrigin, tempIntersection.mPosition);
-    if (tempIntersectionDistance < intersectionDistance) {
-      intersectionDistance = tempIntersectionDistance;
-      intersectionResult = true;
-      intersection = tempIntersection;
-      intersectionShapeIndex = shapeIndex;
-    }
-  }
+  // size_t intersectionShapeIndex;
+  bool intersectionResult = mScene->getIntersection(ray, intersection);
 
   if (!intersectionResult) {
     return Vec3(0.0, 0.0, 0.0);
@@ -121,16 +106,18 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
 
   // figure out what color it is
   Vec3 lightAccumulator = Vec3(AMBIENT_LIGHT_STRENGTH, AMBIENT_LIGHT_STRENGTH, AMBIENT_LIGHT_STRENGTH);
+  Material* material = mScene->mMaterials[0];
 
   for (size_t lightIndex = 0; lightIndex < mScene->mLights.size(); ++lightIndex) {
     Light* light = mScene->mLights[lightIndex];
     bool shadowIntersectionResult = false;
     Ray3 shadowRay = Ray3(intersection.mPosition, (light->mPosition - intersection.mPosition).unit());
+    shadowRay.compute(0.001, &shadowRay.mOrigin);
     for (size_t shapeIndex = 0; shapeIndex < mScene->mShapes.size() && !shadowIntersectionResult; ++shapeIndex) {
-      if (shapeIndex == intersectionShapeIndex) {
-        // this poses a problem for self-shadowing meshes
-        continue;
-      }
+      // if (shapeIndex == intersection.mShapeIndex) {
+      //   // this poses a problem for self-shadowing meshes
+      //   continue;
+      // }
       shadowIntersectionResult = shadowIntersectionResult || mScene->mShapes[shapeIndex]->getIntersection(&shadowRay, &tempIntersection);
     }
 
@@ -139,7 +126,7 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
       VEC3_DATA_TYPE distanceToLight = intersectionToLight.length();
       lightAngle = intersectionToLight.unit();
       lightStrength = light->mStrength * fmax(0.0, lightAngle * intersection.mNormal) / (4.0 * M_PI * distanceToLight * distanceToLight);
-      lightAccumulator += mScene->mMaterials[0]->mDiffuseColor.hadamard(light->mColor * lightStrength);
+      lightAccumulator += material->mDiffuseColor.hadamard(light->mColor * lightStrength);
     }
   }
 
@@ -149,7 +136,7 @@ Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
     Ray3 bounceRay = Ray3(intersection.mPosition, bounceDirection);
     // this is to avoid some float errors
     bounceRay.compute(0.01, &bounceRay.mOrigin);
-    VEC3_DATA_TYPE reflectivity = mScene->mMaterials[0]->mReflectivity;
+    VEC3_DATA_TYPE reflectivity = material->mReflectivity;
     lightAccumulator = (lightAccumulator * (1.0 - reflectivity)) + (traceRay(bounceRay, bounce + 1) * reflectivity);
     // lightAccumulator = lightAccumulator * 0.5;
   }
