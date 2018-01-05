@@ -55,4 +55,7 @@ private:
 
   Camera3* mCamera;
   Scene* mScene;
+
+  // test
+  mutable PseudoRandom mPseudoRandom;
 };

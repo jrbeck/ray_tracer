@@ -183,9 +183,7 @@ Vec3 Vec3::hadamard(const Vec3& a) const {
 //   ret.y = r_num(-10.0, 10.0);
 //   ret.z = r_num(-10.0, 10.0);
 //
-//   ret = Vec3::normalize(ret);
-//
-//   return Vec3::scale(length, ret);
+//   return ret.unit() * length;
 // }
 
 // Vec3 Vec3::getLookVector(VEC3_DATA_TYPE facing, VEC3_DATA_TYPE incline) {

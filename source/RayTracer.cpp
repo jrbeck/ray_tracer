@@ -5,7 +5,8 @@ RayTracer::RayTracer(int width, int height, Scene* scene) :
   mWidth(width),
   mHeight(height),
   mRayThreads(nullptr),
-  mScene(scene)
+  mScene(scene),
+  mPseudoRandom(PseudoRandom(3))
 {
   mOutput = new ImageBuffer();
   mOutput->resize(mWidth, mHeight);
@@ -76,15 +77,26 @@ void RayTracer::drawFrame() const {
 }
 
 void RayTracer::drawScanline(RayThread* rayThread) const {
+  Vec3 jitter;
   for (unsigned i = 0; i < mWidth; ++i) {
     Vec3 pixelPosition = Vec3::lerp(rayThread->leftEdge, rayThread->rightEdge, (VEC3_DATA_TYPE)i / ((VEC3_DATA_TYPE)(mWidth - 1.0)));
-    Ray3 ray = Ray3(mCamera->mPosition, (pixelPosition - mCamera->mPosition).unit());
+    Vec3 accumulator = Vec3(0, 0, 0);
+    int numSamples = 50;
+    for (unsigned j = 0; j < numSamples; j++) {
+      jitter = Vec3(
+        mPseudoRandom.nextDouble(-10.0, 10.0),
+        mPseudoRandom.nextDouble(-10.0, 10.0),
+        mPseudoRandom.nextDouble(-10.0, 10.0)
+      ).unit() * 0.01;
+      Ray3 ray = Ray3(mCamera->mPosition + jitter, (pixelPosition - mCamera->mPosition).unit());
 
-    Vec3 color = traceRay(ray, 0);
+      // Vec3 color = traceRay(ray, 0);
+      accumulator += traceRay(ray, 0);
+    }
     mOutput->setRgb(i, rayThread->j,
-      255.0 * fmin(color.x, 1.0),
-      255.0 * fmin(color.y, 1.0),
-      255.0 * fmin(color.z, 1.0)
+      255.0 * fmin(accumulator.x / (VEC3_DATA_TYPE)numSamples, 1.0),
+      255.0 * fmin(accumulator.y / (VEC3_DATA_TYPE)numSamples, 1.0),
+      255.0 * fmin(accumulator.z / (VEC3_DATA_TYPE)numSamples, 1.0)
     );
   }
 
