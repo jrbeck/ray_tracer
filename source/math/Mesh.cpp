@@ -4,7 +4,7 @@ bool Mesh::getIntersection(const Ray3* ray, Intersection* intersection) {
   VEC3_DATA_TYPE t_min = 1000000.0, t;
   Vec3 normal;
   size_t numTriangles = mTriangles.size() / 3;
-  for (size_t i = 0; i < numTriangles; i++) {
+  for (size_t i = 0; i < numTriangles; ++i) {
     size_t triangleIndex = i * 3;
     if (Triangle::rayTriangleIntersect(*ray, mVertices[mTriangles[triangleIndex]], mVertices[mTriangles[triangleIndex + 1]], mVertices[mTriangles[triangleIndex + 2]], t)) {
       if (t > 0.0 && t < t_min) {
@@ -49,7 +49,7 @@ bool Mesh::addTriangle(int* vertexIndices, int* triangleIndex) {
   if (triangleIndex != nullptr) {
     *triangleIndex = (int)(mTriangles.size() / 3);
   }
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; ++i) {
     mTriangles.push_back(vertexIndices[i]);
   }
   return true;
@@ -58,15 +58,15 @@ bool Mesh::addTriangle(int* vertexIndices, int* triangleIndex) {
 void Mesh::print() {
   char scratch[64];
   printf("Vertices ----------\n");
-  for (size_t i = 0; i < mVertices.size(); i++) {
-    sprintf(scratch, "%d", i);
+  for (size_t i = 0; i < mVertices.size(); ++i) {
+    sprintf(scratch, "%lu", i);
     mVertices[i].print(scratch);
   }
   printf("\nTriangles ----------\n");
   size_t numTriangles = mTriangles.size() / 3;
-  for (size_t i = 0; i < numTriangles; i++) {
+  for (size_t i = 0; i < numTriangles; ++i) {
     size_t triangleIndex = i * 3;
-    printf("%d: %d, %d, %d\n", i, mTriangles[triangleIndex], mTriangles[triangleIndex + 1], mTriangles[triangleIndex + 2]);
+    printf("%lu: %d, %d, %d\n", i, mTriangles[triangleIndex], mTriangles[triangleIndex + 1], mTriangles[triangleIndex + 2]);
   }
   printf("----------\n");
 }

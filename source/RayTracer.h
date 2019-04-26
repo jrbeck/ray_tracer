@@ -43,12 +43,14 @@ public:
 
 private:
   void drawScanline(RayThread* rayThread) const;
-  Vec3 traceRay(const Ray3& ray, int bounce) const;
+  void drawScanlineAntiAliased(RayThread* rayThread) const;
+
+  Vec3 traceRay(const Ray3& ray, size_t bounce) const;
 
   const size_t kNumThreads = 8;
   const size_t kMaxBounces = 6;
 
-  unsigned mWidth, mHeight;
+  unsigned int mWidth, mHeight;
   mutable VEC3_DATA_TYPE mAngle;
   ImageBuffer* mOutput;
   RayThread* mRayThreads;

@@ -269,6 +269,10 @@ int main(int nargs, char** argv) {
   int screenW = 256;
   int screenH = 256;
 
+  if (nargs > 1) {
+    screenW = screenH = atoi(argv[1]);
+  }
+
   Scene* scene = buildTestScene();
   RayTracer* rayTracer = new RayTracer(screenW, screenH, scene);
   showIt(rayTracer);

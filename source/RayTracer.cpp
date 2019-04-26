@@ -1,9 +1,9 @@
 #include "RayTracer.h"
 
 RayTracer::RayTracer(int width, int height, Scene* scene) :
-  mOutput(nullptr),
   mWidth(width),
   mHeight(height),
+  mOutput(nullptr),
   mRayThreads(nullptr),
   mScene(scene),
   mPseudoRandom(PseudoRandom(3))
@@ -50,7 +50,7 @@ void RayTracer::drawFrame() const {
   Vec3 leftEdge, rightEdge;
 
   for (unsigned j = 0; j < mHeight;) {
-    for (unsigned t = 0; (t < kNumThreads) && (j < mHeight); t++) {
+    for (unsigned t = 0; (t < kNumThreads) && (j < mHeight); ++t) {
       if (mRayThreads[t].state == RayThreadStates::working) {
         continue;
       }
@@ -64,6 +64,8 @@ void RayTracer::drawFrame() const {
       mRayThreads[t].leftEdge = Vec3::lerp(viewport[ViewportCorners::topLeft], viewport[ViewportCorners::bottomLeft], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
       mRayThreads[t].rightEdge = Vec3::lerp(viewport[ViewportCorners::topRight], viewport[ViewportCorners::bottomRight], (VEC3_DATA_TYPE)j / ((VEC3_DATA_TYPE)(mHeight - 1.0)));
       mRayThreads[t].thread = std::thread(&RayTracer::drawScanline, this, &mRayThreads[t]);
+      // mRayThreads[t].thread = std::thread(&RayTracer::drawScanlineAntiAliased, this, &mRayThreads[t]);
+
       ++j;
     }
   }
@@ -77,12 +79,28 @@ void RayTracer::drawFrame() const {
 }
 
 void RayTracer::drawScanline(RayThread* rayThread) const {
+  for (unsigned i = 0; i < mWidth; ++i) {
+    Vec3 pixelPosition = Vec3::lerp(rayThread->leftEdge, rayThread->rightEdge, (VEC3_DATA_TYPE)i / ((VEC3_DATA_TYPE)(mWidth - 1.0)));
+    Ray3 ray = Ray3(mCamera->mPosition, (pixelPosition - mCamera->mPosition).unit());
+    Vec3 pixel = traceRay(ray, 0);
+    mOutput->setRgb(i, rayThread->j,
+      255.0 * fmin(pixel.x, 1.0),
+      255.0 * fmin(pixel.y, 1.0),
+      255.0 * fmin(pixel.z, 1.0)
+    );
+  }
+
+  rayThread->state = RayThreadStates::complete;
+}
+
+void RayTracer::drawScanlineAntiAliased(RayThread* rayThread) const {
   Vec3 jitter;
   for (unsigned i = 0; i < mWidth; ++i) {
     Vec3 pixelPosition = Vec3::lerp(rayThread->leftEdge, rayThread->rightEdge, (VEC3_DATA_TYPE)i / ((VEC3_DATA_TYPE)(mWidth - 1.0)));
     Vec3 accumulator = Vec3(0, 0, 0);
-    int numSamples = 50;
-    for (unsigned j = 0; j < numSamples; j++) {
+    // this is for anti-aliasing
+    unsigned int numSamples = 5;
+    for (unsigned int j = 0; j < numSamples; j++) {
       jitter = Vec3(
         mPseudoRandom.nextDouble(-10.0, 10.0),
         mPseudoRandom.nextDouble(-10.0, 10.0),
@@ -103,12 +121,12 @@ void RayTracer::drawScanline(RayThread* rayThread) const {
   rayThread->state = RayThreadStates::complete;
 }
 
-Vec3 RayTracer::traceRay(const Ray3& ray, int bounce) const {
+Vec3 RayTracer::traceRay(const Ray3& ray, size_t bounce) const {
   Vec3 lightAngle;
   VEC3_DATA_TYPE lightStrength;
 
   Intersection intersection, tempIntersection;
-  VEC3_DATA_TYPE intersectionDistance, tempIntersectionDistance;
+  // VEC3_DATA_TYPE intersectionDistance, tempIntersectionDistance;
   // size_t intersectionShapeIndex;
   bool intersectionResult = mScene->getIntersection(ray, intersection);
 
